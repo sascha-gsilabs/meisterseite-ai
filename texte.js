@@ -38,7 +38,7 @@ window.TEXTE = {
 
   /* Vorteile */
   vorteile: {
-    label: `Warum Meisterseite.ai`,
+    label: `Warum WebPolier`,
     titel: `Ihr Vorteil: Professionelle Website zum fairen Preis`,
     text: `Andere Agenturen verlangen mehrere tausend Euro für eine neue Website. Wir bauen Ihnen eine moderne, anfragestarke Website für 599&nbsp;€.`,
     karten: [
