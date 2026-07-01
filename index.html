@@ -794,6 +794,7 @@
         <ul class="mt-4 space-y-2.5 text-[15px] font-medium text-ink/75">
           <li><a href="impressum.html" class="link-underline hover:text-ink">Impressum</a></li>
           <li><a href="datenschutz.html" class="link-underline hover:text-ink">Datenschutz</a></li>
+          <li><a href="#" data-cookie-settings class="link-underline hover:text-ink">Cookie-Einstellungen</a></li>
         </ul>
         <h4 class="mt-7 text-[12.5px] font-bold uppercase tracking-[0.18em] text-muted">Kontakt</h4>
         <ul class="mt-4 space-y-2.5 text-[15px] font-medium text-ink/75">
@@ -809,6 +810,21 @@
     </div>
   </div>
 </footer>
+
+<!-- ===================== COOKIE-/CONSENT-BANNER ===================== -->
+<div id="consentBanner" class="fixed inset-x-0 bottom-0 z-[60] hidden px-3 pb-3">
+  <div class="mx-auto max-w-3xl rounded-2xl border border-line bg-white p-4 shadow-float sm:p-5">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <p class="text-[13.5px] leading-relaxed text-muted">
+        Wir setzen optional den Analyse-Dienst <strong class="text-ink">Apollo.io</strong> (USA) ein, um Website-Besuche auszuwerten. Dieser lädt nur mit Ihrer Einwilligung. Details in der <a href="datenschutz.html" class="font-medium text-ink underline underline-offset-2 hover:text-blue">Datenschutzerklärung</a>.
+      </p>
+      <div class="flex shrink-0 gap-2.5">
+        <button id="consentDecline" type="button" class="rounded-full border border-line bg-white px-5 py-2.5 text-sm font-semibold text-ink transition-transform duration-200 hover:-translate-y-0.5 hover:border-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue">Ablehnen</button>
+        <button id="consentAccept" type="button" class="btn-primary rounded-full px-5 py-2.5 text-sm font-semibold shadow-cta">Zustimmen</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script src="texte.js"></script>
 <script>
@@ -1008,6 +1024,47 @@
 
     render();
     start();
+  })();
+</script>
+
+<!-- ===================== CONSENT / APOLLO-TRACKER (nur nach Einwilligung) ===================== -->
+<script>
+  (function(){
+    var KEY = 'wp-consent';
+    var banner = document.getElementById('consentBanner');
+
+    function loadApollo(){
+      if (window.__apolloLoaded) return;
+      window.__apolloLoaded = true;
+      var n = Math.random().toString(36).substring(7);
+      var o = document.createElement('script');
+      o.src = 'https://assets.apollo.io/micro/website-tracker/tracker.iife.js?nocache=' + n;
+      o.async = true; o.defer = true;
+      o.onload = function(){ if (window.trackingFunctions) window.trackingFunctions.onLoad({ appId: '6a3a8cdc1229b300147d5bc7' }); };
+      document.head.appendChild(o);
+    }
+    function hide(){ if (banner) banner.classList.add('hidden'); }
+    function show(){ if (banner) banner.classList.remove('hidden'); }
+
+    var choice = null;
+    try { choice = localStorage.getItem(KEY); } catch(e){}
+    if (choice === 'accepted') { loadApollo(); }
+    else if (choice !== 'declined') { show(); }
+
+    document.getElementById('consentAccept') && document.getElementById('consentAccept').addEventListener('click', function(){
+      try { localStorage.setItem(KEY, 'accepted'); } catch(e){}
+      hide(); loadApollo();
+    });
+    document.getElementById('consentDecline') && document.getElementById('consentDecline').addEventListener('click', function(){
+      try { localStorage.setItem(KEY, 'declined'); } catch(e){}
+      hide();
+    });
+
+    // Widerruf / erneut aufrufen (Footer-Link)
+    window.openCookieSettings = function(){ try { localStorage.removeItem(KEY); } catch(e){} show(); };
+    document.querySelectorAll('[data-cookie-settings]').forEach(function(el){
+      el.addEventListener('click', function(ev){ ev.preventDefault(); window.openCookieSettings(); });
+    });
   })();
 </script>
 </body>
